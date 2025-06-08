@@ -1,6 +1,6 @@
 import type { RenderContext, MarkdownContent, EffectLevel, ExportFormat } from './types.js';
 import { initializeCanvas, clearCanvas, renderSlide, renderSlideIndicator } from './canvas.js';
-import { parseMarkdownSlides } from './markdown.js';
+import { parseMarkdownSlides, processImageFile, insertImageIntoMarkdown } from './markdown.js';
 import { applyCRTEffects, updateAnimation } from './effects.js';
 import { themes, getThemeByName, updateThemeStyles } from './theme.js';
 import { exportAsHTML } from './export.js';
@@ -83,6 +83,14 @@ Drop a Markdown file or use the file input to load your presentation.
       }
     });
 
+    const imageInput = document.getElementById('imageFile') as HTMLInputElement;
+    imageInput?.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        this.loadImageFile(file);
+      }
+    });
+
     // Real-time markdown editor
     const markdownEditor = document.getElementById('markdownEditor') as HTMLTextAreaElement;
     if (markdownEditor) {
@@ -138,12 +146,14 @@ Drop a Markdown file or use the file input to load your presentation.
     document.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone?.classList.remove('active');
-      
+
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         const file = files[0];
         if (file.type === 'text/markdown' || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
           this.loadMarkdownFile(file);
+        } else if (file.type.startsWith('image/')) {
+          this.loadImageFile(file);
         }
       }
     });
@@ -155,6 +165,20 @@ Drop a Markdown file or use the file input to load your presentation.
       await this.loadMarkdown(content);
     } catch (error) {
       console.error('Failed to load markdown file:', error);
+    }
+  }
+
+  private async loadImageFile(file: File): Promise<void> {
+    try {
+      const asset = await processImageFile(file);
+      const markdownEditor = document.getElementById('markdownEditor') as HTMLTextAreaElement | null;
+      if (markdownEditor) {
+        const updated = insertImageIntoMarkdown(markdownEditor.value, file.name, asset.data);
+        markdownEditor.value = updated;
+        await this.loadMarkdown(updated);
+      }
+    } catch (error) {
+      console.error('Failed to load image file:', error);
     }
   }
 
