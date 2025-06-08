@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  // Use relative paths for assets so the build works when opened via file://
+  base: './',
   server: {
     host: '0.0.0.0',
     port: 3000,
