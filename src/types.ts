@@ -37,7 +37,7 @@ export type Theme = {
   accentColor: string;
 };
 
-export type EffectLevel = 'none' | 'light' | 'heavy';
+export type EffectLevel = 'none' | 'light' | 'heavy' | 'extreme';
 
 export type CRTEffects = {
   scanlines: boolean;

@@ -86,7 +86,7 @@ export const createEffectLevelSelector = (
   container: HTMLElement,
   currentLevel: string,
   currentTheme: Theme,
-  onLevelChange: (level: 'none' | 'light' | 'heavy') => void
+  onLevelChange: (level: 'none' | 'light' | 'heavy' | 'extreme') => void
 ): void => {
   const selector = document.createElement('select');
   selector.className = 'effect-selector';
@@ -105,6 +105,7 @@ export const createEffectLevelSelector = (
     { value: 'none', label: 'No Effects' },
     { value: 'light', label: 'Light Effects' },
     { value: 'heavy', label: 'Heavy Effects' },
+    { value: 'extreme', label: 'Extreme Effects' },
   ];
   
   levels.forEach(level => {
@@ -117,7 +118,7 @@ export const createEffectLevelSelector = (
   
   selector.addEventListener('change', (e) => {
     const target = e.target as HTMLSelectElement;
-    onLevelChange(target.value as 'none' | 'light' | 'heavy');
+    onLevelChange(target.value as 'none' | 'light' | 'heavy' | 'extreme');
   });
   
   container.appendChild(selector);

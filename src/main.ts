@@ -226,6 +226,12 @@ Drop a Markdown file or use the file input to load your presentation.
         this.renderCtx.effects.rgbOffset = true;
         this.renderCtx.effects.jitter = true;
         break;
+      case 'extreme':
+        this.renderCtx.effects.scanlines = true;
+        this.renderCtx.effects.noise = true;
+        this.renderCtx.effects.rgbOffset = true;
+        this.renderCtx.effects.jitter = true;
+        break;
     }
     
     this.render();
