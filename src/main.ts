@@ -48,6 +48,11 @@ Drop a Markdown file or use the file input to load your presentation.
   private setupEventListeners(): void {
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault();
