@@ -1,5 +1,11 @@
 import type { RenderContext, MarkdownContent } from "./types.js";
 import { jsPDF } from "jspdf";
+import {
+  clearCanvas,
+  renderSlide,
+  renderSlideIndicator,
+} from "./canvas.js";
+import { applyCRTEffects } from "./effects.js";
 
 export const exportAsHTML = async (
   renderCtx: RenderContext,
@@ -486,15 +492,23 @@ export const exportAsPDF = async (
       // Set current slide
       renderCtx.navigation.currentSlide = i;
 
-      // Re-render the slide (this would need to be called from main app)
-      // For now, we'll use the current canvas state
+      // Render the slide onto the canvas
+      clearCanvas(renderCtx);
+      await renderSlide(renderCtx, content.slides[i]);
+
+      if (content.slides.length > 1) {
+        renderSlideIndicator(renderCtx);
+      }
+
+      if (renderCtx.effects.level !== "none") {
+        applyCRTEffects(renderCtx);
+      }
 
       // Add new page for each slide
       pdf.addPage([config.width, config.height], "landscape");
 
-      // Get canvas data URL for current slide
-      const canvas = renderCtx.ctx.canvas;
-      const imgData = canvas.toDataURL("image/png");
+      // Capture canvas as image
+      const imgData = renderCtx.canvas.toDataURL("image/png");
 
       // Add image to PDF page
       pdf.addImage(imgData, "PNG", 0, 0, config.width, config.height);
