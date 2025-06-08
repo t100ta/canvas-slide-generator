@@ -53,8 +53,7 @@ npm test
    - 自動的にbase64変換されMarkdownに挿入
 
 3. **スライド生成**
-   - リアルタイムで自動生成
-   - "Generate Slide"ボタンで手動更新
+   - リアルタイムで自動生成（手動更新ボタンなし）
 
 4. **エクスポート**
    - "Export HTML"ボタンでスタンドアロンHTMLファイルをダウンロード
@@ -71,7 +70,7 @@ canvas-slide-generator/
 │   ├── main.ts          # メインアプリケーション
 │   ├── types.ts         # TypeScript型定義
 │   ├── utils.ts         # ユーティリティ関数
-│   ├── parser.ts        # Markdownパーサー
+│   ├── markdown.ts      # Markdownパーサー
 │   ├── canvas.ts        # Canvas描画エンジン
 │   ├── effects.ts       # CRT効果とアニメーション
 │   ├── ui.ts           # UI管理
