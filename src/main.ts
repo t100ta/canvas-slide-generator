@@ -5,6 +5,7 @@ import { applyCRTEffects, updateAnimation } from './effects.js';
 import { themes, getThemeByName, updateThemeStyles } from './theme.js';
 import { exportAsHTML, exportAsPNG, exportAsPDF } from './export.js';
 import { createTransition } from './transitions.js';
+import { debounce } from './utils.js';
 
 class SlidePresentation {
   private renderCtx: RenderContext;
@@ -76,6 +77,17 @@ Drop a Markdown file or use the file input to load your presentation.
         this.loadMarkdownFile(file);
       }
     });
+
+    // Real-time markdown editor
+    const markdownEditor = document.getElementById('markdownEditor') as HTMLTextAreaElement;
+    if (markdownEditor) {
+      const handler = debounce((value: string) => {
+        this.loadMarkdown(value);
+      }, 300);
+      markdownEditor.addEventListener('input', (e) => {
+        handler((e.target as HTMLTextAreaElement).value);
+      });
+    }
 
     // Theme selector
     const themeSelector = document.getElementById('themeSelector') as HTMLSelectElement;
