@@ -408,19 +408,21 @@ export const exportAsHTML = async (
             
             // Scanlines
             if (effectsData.scanlines) {
-                for (let y = 0; y < 720; y += 4) {
+                const step = effectsData.level === 'heavy' ? 3 : 4;
+                const dim = effectsData.level === 'heavy' ? 0.7 : 0.85;
+                for (let y = 0; y < 720; y += step) {
                     for (let x = 0; x < 1280; x++) {
                         const index = (y * 1280 + x) * 4;
-                        data[index] *= 0.8;     // R
-                        data[index + 1] *= 0.8; // G
-                        data[index + 2] *= 0.8; // B
+                        data[index] *= dim;     // R
+                        data[index + 1] *= dim; // G
+                        data[index + 2] *= dim; // B
                     }
                 }
             }
             
             // Noise
             if (effectsData.noise) {
-                const intensity = effectsData.level === 'heavy' ? 0.25 : effectsData.level === 'light' ? 0.05 : 0;
+                const intensity = effectsData.level === 'heavy' ? 0.25 : effectsData.level === 'light' ? 0.08 : 0;
                 for (let i = 0; i < data.length; i += 4) {
                     const noise = (Math.random() - 0.5) * intensity * 255;
                     data[i] += noise;     // R
