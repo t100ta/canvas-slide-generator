@@ -30,7 +30,7 @@ export const applyTransition = (
   renderCtx: RenderContext,
   previousCanvas?: HTMLCanvasElement
 ): void => {
-  const { transition, ctx } = renderCtx;
+  const { transition, ctx, theme } = renderCtx;
   
   if (!transition.isActive || !previousCanvas) return;
   
@@ -43,6 +43,9 @@ export const applyTransition = (
       break;
     case 'crt-flicker':
       applyCRTFlickerTransition(ctx, previousCanvas, transition.progress);
+      break;
+    case 'glitch':
+      applyGlitchTransition(ctx, previousCanvas, transition.progress, theme.accentColor);
       break;
     default:
       break;
@@ -112,6 +115,31 @@ const applyCRTFlickerTransition = (
     ctx.putImageData(imageData, 0, 0);
   }
   
+  ctx.restore();
+};
+
+const applyGlitchTransition = (
+  ctx: CanvasRenderingContext2D,
+  previousCanvas: HTMLCanvasElement,
+  progress: number,
+  accentColor: string
+): void => {
+  const intensity = Math.sin(progress * Math.PI * 5) * 5;
+
+  ctx.save();
+  ctx.drawImage(previousCanvas, 0, 0);
+
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalAlpha = 0.7 * (1 - progress);
+  ctx.filter = `drop-shadow(0 0 5px ${accentColor})`;
+
+  ctx.drawImage(previousCanvas, intensity, 0);
+  ctx.drawImage(previousCanvas, -intensity, 0);
+
+  ctx.filter = 'none';
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+
   ctx.restore();
 };
 

@@ -17,4 +17,10 @@ describe('transitions', () => {
     expect(t.progress).toBe(1);
     expect(t.isActive).toBe(false);
   });
+
+  test('createTransition handles glitch type', () => {
+    const t = createTransition('glitch', 200);
+    expect(t.type).toBe('glitch');
+    expect(t.duration).toBe(200);
+  });
 });
