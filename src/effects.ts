@@ -2,16 +2,23 @@ import type { RenderContext } from './types.js';
 import { random, clamp } from './utils.js';
 
 export const applyScanlines = (renderCtx: RenderContext): void => {
-  const { ctx, config, animation } = renderCtx;
-  
+  const { ctx, config, animation, effects } = renderCtx;
+
+  const heavy = effects.level === 'heavy';
+
+  const baseAlpha = heavy ? 0.25 : 0.1;
+  const oscillation = heavy ? 0.1 : 0.05;
+  const lineStep = heavy ? 2 : 3;
+  const offsetScale = heavy ? 1.5 : 1;
+
   // Create scanline effect with composite blending
   ctx.globalCompositeOperation = 'multiply';
-  ctx.globalAlpha = 0.15 + Math.sin(animation.time * 0.01) * 0.05;
+  ctx.globalAlpha = baseAlpha + Math.sin(animation.time * 0.01) * oscillation;
   ctx.fillStyle = '#000000';
-  
+
   // Draw horizontal scanlines
-  for (let y = 0; y < config.height; y += 3) {
-    const offset = Math.sin(animation.time * 0.02 + y * 0.01) * 1;
+  for (let y = 0; y < config.height; y += lineStep) {
+    const offset = Math.sin(animation.time * 0.02 + y * 0.01) * offsetScale;
     ctx.fillRect(0, y + offset, config.width, 1);
   }
   
@@ -21,13 +28,17 @@ export const applyScanlines = (renderCtx: RenderContext): void => {
 };
 
 export const applyNoise = (renderCtx: RenderContext): void => {
-  const { ctx, config, animation } = renderCtx;
+  const { ctx, config, animation, effects } = renderCtx;
+
+  const heavy = effects.level === 'heavy';
   
   const imageData = ctx.getImageData(0, 0, config.width, config.height);
   const data = imageData.data;
   
   // Add random noise with time-based variation
-  const noiseIntensity = 0.03 + Math.sin(animation.time * 0.005) * 0.02;
+  const base = heavy ? 0.05 : 0.015;
+  const swing = heavy ? 0.03 : 0.01;
+  const noiseIntensity = base + Math.sin(animation.time * 0.005) * swing;
   
   for (let i = 0; i < data.length; i += 4) {
     if (Math.random() < noiseIntensity) {
@@ -42,7 +53,9 @@ export const applyNoise = (renderCtx: RenderContext): void => {
 };
 
 export const applyRGBOffset = (renderCtx: RenderContext): void => {
-  const { ctx, config, animation } = renderCtx;
+  const { ctx, config, animation, effects } = renderCtx;
+
+  const heavy = effects.level === 'heavy';
   
   // Get the current canvas content
   const imageData = ctx.getImageData(0, 0, config.width, config.height);
@@ -51,8 +64,10 @@ export const applyRGBOffset = (renderCtx: RenderContext): void => {
   // Create a copy for manipulation
   const newData = new Uint8ClampedArray(data);
   
-  const offsetX = Math.sin(animation.time * 0.01) * 3;
-  const offsetY = Math.cos(animation.time * 0.015) * 2;
+  const offsetScaleX = heavy ? 5 : 3;
+  const offsetScaleY = heavy ? 3 : 2;
+  const offsetX = Math.sin(animation.time * 0.01) * offsetScaleX;
+  const offsetY = Math.cos(animation.time * 0.015) * offsetScaleY;
   
   // Apply RGB channel separation
   for (let y = 0; y < config.height; y++) {
@@ -92,13 +107,16 @@ export const applyBlur = (renderCtx: RenderContext): void => {
 };
 
 export const applyJitter = (renderCtx: RenderContext): void => {
-  const { animation } = renderCtx;
-  
+  const { animation, effects } = renderCtx;
+
   if (!renderCtx.effects.jitter) return;
-  
+
   // Update jitter values
-  animation.jitterX = Math.sin(animation.time * 0.1) * 0.5;
-  animation.jitterY = Math.cos(animation.time * 0.13) * 0.3;
+  const heavy = effects.level === 'heavy';
+  const ampX = heavy ? 0.5 : 0.2;
+  const ampY = heavy ? 0.3 : 0.1;
+  animation.jitterX = Math.sin(animation.time * 0.1) * ampX;
+  animation.jitterY = Math.cos(animation.time * 0.13) * ampY;
 };
 
 export const updateAnimation = (renderCtx: RenderContext): void => {
