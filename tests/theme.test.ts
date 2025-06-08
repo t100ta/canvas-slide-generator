@@ -24,10 +24,10 @@ describe('theme utilities', () => {
     const handler = jest.fn();
     createEffectLevelSelector(container, 'none', themes[0], handler);
     const select = container.querySelector('select') as HTMLSelectElement;
-    expect(select.options.length).toBe(3);
-    select.value = 'heavy';
+    expect(select.options.length).toBe(4);
+    select.value = 'extreme';
     select.dispatchEvent(new Event('change'));
-    expect(handler).toHaveBeenCalledWith('heavy');
+    expect(handler).toHaveBeenCalledWith('extreme');
   });
 
   test('updateThemeStyles sets css variables', () => {

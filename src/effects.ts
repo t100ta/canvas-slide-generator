@@ -4,12 +4,14 @@ import { random, clamp } from './utils.js';
 export const applyScanlines = (renderCtx: RenderContext): void => {
   const { ctx, config, animation, effects } = renderCtx;
 
-  const heavy = effects.level === 'heavy';
+  const level = effects.level;
+  const heavy = level === 'heavy' || level === 'extreme';
+  const extreme = level === 'extreme';
 
-  const baseAlpha = heavy ? 0.25 : 0.1;
-  const oscillation = heavy ? 0.1 : 0.05;
-  const lineStep = heavy ? 2 : 3;
-  const offsetScale = heavy ? 1.5 : 1;
+  const baseAlpha = extreme ? 0.35 : heavy ? 0.25 : 0.1;
+  const oscillation = extreme ? 0.15 : heavy ? 0.1 : 0.05;
+  const lineStep = extreme ? 1 : heavy ? 2 : 3;
+  const offsetScale = extreme ? 2 : heavy ? 1.5 : 1;
 
   // Create scanline effect with composite blending
   ctx.globalCompositeOperation = 'multiply';
@@ -30,14 +32,16 @@ export const applyScanlines = (renderCtx: RenderContext): void => {
 export const applyNoise = (renderCtx: RenderContext): void => {
   const { ctx, config, animation, effects } = renderCtx;
 
-  const heavy = effects.level === 'heavy';
+  const level = effects.level;
+  const heavy = level === 'heavy' || level === 'extreme';
+  const extreme = level === 'extreme';
   
   const imageData = ctx.getImageData(0, 0, config.width, config.height);
   const data = imageData.data;
   
   // Add random noise with time-based variation
-  const base = heavy ? 0.05 : 0.015;
-  const swing = heavy ? 0.03 : 0.01;
+  const base = extreme ? 0.08 : heavy ? 0.05 : 0.015;
+  const swing = extreme ? 0.05 : heavy ? 0.03 : 0.01;
   const noiseIntensity = base + Math.sin(animation.time * 0.005) * swing;
   
   for (let i = 0; i < data.length; i += 4) {
@@ -55,7 +59,9 @@ export const applyNoise = (renderCtx: RenderContext): void => {
 export const applyRGBOffset = (renderCtx: RenderContext): void => {
   const { ctx, config, animation, effects } = renderCtx;
 
-  const heavy = effects.level === 'heavy';
+  const level = effects.level;
+  const heavy = level === 'heavy' || level === 'extreme';
+  const extreme = level === 'extreme';
   
   // Get the current canvas content
   const imageData = ctx.getImageData(0, 0, config.width, config.height);
@@ -64,8 +70,8 @@ export const applyRGBOffset = (renderCtx: RenderContext): void => {
   // Create a copy for manipulation
   const newData = new Uint8ClampedArray(data);
   
-  const offsetScaleX = heavy ? 5 : 3;
-  const offsetScaleY = heavy ? 3 : 2;
+  const offsetScaleX = extreme ? 8 : heavy ? 5 : 3;
+  const offsetScaleY = extreme ? 6 : heavy ? 3 : 2;
   const offsetX = Math.sin(animation.time * 0.01) * offsetScaleX;
   const offsetY = Math.cos(animation.time * 0.015) * offsetScaleY;
   
@@ -112,9 +118,11 @@ export const applyJitter = (renderCtx: RenderContext): void => {
   if (!renderCtx.effects.jitter) return;
 
   // Update jitter values
-  const heavy = effects.level === 'heavy';
-  const ampX = heavy ? 0.5 : 0.2;
-  const ampY = heavy ? 0.3 : 0.1;
+  const level = effects.level;
+  const heavy = level === 'heavy' || level === 'extreme';
+  const extreme = level === 'extreme';
+  const ampX = extreme ? 1 : heavy ? 0.5 : 0.2;
+  const ampY = extreme ? 0.6 : heavy ? 0.3 : 0.1;
   animation.jitterX = Math.sin(animation.time * 0.1) * ampX;
   animation.jitterY = Math.cos(animation.time * 0.13) * ampY;
 };
@@ -141,18 +149,18 @@ export const applyCRTEffects = (renderCtx: RenderContext): void => {
     return;
   }
   
-  // Apply scanlines for light and heavy effects
-  if (effectLevel === 'light' || effectLevel === 'heavy') {
+  // Apply scanlines for light, heavy and extreme effects
+  if (effectLevel === 'light' || effectLevel === 'heavy' || effectLevel === 'extreme') {
     applyScanlines(renderCtx);
   }
-  
-  // Apply noise for light and heavy effects
-  if (effectLevel === 'light' || effectLevel === 'heavy') {
+
+  // Apply noise for light, heavy and extreme effects
+  if (effectLevel === 'light' || effectLevel === 'heavy' || effectLevel === 'extreme') {
     applyNoise(renderCtx);
   }
-  
-  // Apply RGB offset only for heavy effects
-  if (effectLevel === 'heavy') {
+
+  // Apply RGB offset for heavy and extreme effects
+  if (effectLevel === 'heavy' || effectLevel === 'extreme') {
     applyRGBOffset(renderCtx);
   }
   
