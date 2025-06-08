@@ -91,5 +91,5 @@ export type TransitionState = {
 };
 
 
-export type ExportFormat = 'html' | 'png' | 'pdf';
+export type ExportFormat = 'html';
 
