@@ -36,6 +36,9 @@ npm run dev
 
 # ビルド
 npm run build
+
+# コンパイルテスト
+npm test
 ```
 
 ### アプリケーションの使用
