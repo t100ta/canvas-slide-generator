@@ -81,7 +81,7 @@ export type RenderContext = {
   transition: TransitionState;
   images: Map<string, ImageAsset>;
 };
-export type TransitionType = 'none' | 'fade' | 'slide' | 'crt-flicker';
+export type TransitionType = 'none' | 'fade' | 'slide' | 'crt-flicker' | 'glitch';
 
 export type TransitionState = {
   type: TransitionType;
