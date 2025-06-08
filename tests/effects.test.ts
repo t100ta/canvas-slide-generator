@@ -1,4 +1,4 @@
-import { updateAnimation, createAnimationLoop } from '../src/effects.js';
+import { updateAnimation, createAnimationLoop, applyJitter } from '../src/effects.js';
 import type { RenderContext } from '../src/types.js';
 
 declare const global: any;
@@ -60,5 +60,30 @@ describe('effects utilities', () => {
     toggle();
     jest.advanceTimersByTime(10);
     expect(renderFn.mock.calls.length).toBeGreaterThan(calls);
+  });
+
+  test('applyJitter updates values when enabled', () => {
+    const renderCtx: RenderContext = {
+      canvas: {} as HTMLCanvasElement,
+      ctx: {} as any,
+      config: { width: 1, height: 1, contentWidth: 1, contentHeight: 1, marginX: 0, marginY: 0 },
+      theme: {} as any,
+      effects: { scanlines: false, noise: false, rgbOffset: false, blur: false, jitter: true, level: 'light' },
+      animation: { time: 5, noiseOffset: 0, jitterX: 0, jitterY: 0, enabled: true },
+      navigation: { currentSlide: 0, totalSlides: 1, canGoNext: false, canGoPrev: false },
+      transition: { type: 'none', duration: 0, progress: 0, isActive: false },
+      images: new Map(),
+    };
+
+    applyJitter(renderCtx);
+    expect(renderCtx.animation.jitterX).not.toBe(0);
+    expect(renderCtx.animation.jitterY).not.toBe(0);
+
+    renderCtx.effects.jitter = false;
+    renderCtx.animation.jitterX = 0;
+    renderCtx.animation.jitterY = 0;
+    applyJitter(renderCtx);
+    expect(renderCtx.animation.jitterX).toBe(0);
+    expect(renderCtx.animation.jitterY).toBe(0);
   });
 });

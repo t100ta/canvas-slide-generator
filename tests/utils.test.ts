@@ -1,4 +1,4 @@
-import { clamp, lerp, random, escapeHtml, fileToBase64, loadImage } from '../src/utils.js';
+import { clamp, lerp, random, escapeHtml, fileToBase64, loadImage, downloadFile, formatTimestamp } from '../src/utils.js';
 
 describe('utils', () => {
   test('clamp limits values', () => {
@@ -47,5 +47,41 @@ describe('utils', () => {
     const img = await loadImage('data:image/png;base64,abc');
     expect(img.width).toBe(1);
     global.Image = original;
+  });
+
+  test('downloadFile creates and clicks anchor', () => {
+    const anchor = document.createElement('a');
+    const click = jest.fn();
+    anchor.click = click;
+    jest.spyOn(document, 'createElement').mockReturnValue(anchor);
+    const appendSpy = jest.spyOn(document.body, 'appendChild');
+    const removeSpy = jest.spyOn(document.body, 'removeChild');
+    const origCreate = URL.createObjectURL;
+    const origRevoke = URL.revokeObjectURL;
+    const urlSpy = jest.fn().mockReturnValue('blob:url');
+    const revokeSpy = jest.fn();
+    // @ts-ignore
+    URL.createObjectURL = urlSpy;
+    // @ts-ignore
+    URL.revokeObjectURL = revokeSpy;
+
+    downloadFile('hi', 'a.txt', 'text/plain');
+
+    expect(anchor.download).toBe('a.txt');
+    expect(anchor.href).toMatch(/^blob:/);
+    expect(click).toHaveBeenCalled();
+    expect(appendSpy).toHaveBeenCalledWith(anchor);
+    expect(removeSpy).toHaveBeenCalledWith(anchor);
+
+    (document.createElement as jest.Mock).mockRestore();
+    appendSpy.mockRestore();
+    removeSpy.mockRestore();
+    URL.createObjectURL = origCreate;
+    URL.revokeObjectURL = origRevoke;
+  });
+
+  test('formatTimestamp returns formatted string', () => {
+    const ts = formatTimestamp();
+    expect(ts).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/);
   });
 });
