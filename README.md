@@ -169,6 +169,6 @@ Canvas Slide Generator - TypeScript + Vite implementation
 npm run build:pages
 ```
 
-`.github/workflows/pages.yml` により、`main`ブランチへプッシュすると自動的にビルドが実行され、生成された`docs`ディレクトリが GitHub Pages にデプロイされます。ワークフローでは `actions/upload-pages-artifact@v3` と `actions/deploy-pages@v4` を使用しています。リポジトリ設定で Pages ソースを `GitHub Actions` に変更すれば公開できます。
+`.github/workflows/pages.yml` により、`main`ブランチへプッシュすると自動的にビルドが実行され、生成された`docs`ディレクトリの内容が GitHub Pages にデプロイされます。ワークフローでは `actions/upload-pages-artifact@v3` と `actions/deploy-pages@v4` を使用しています。リポジトリ設定で Pages ソースを `GitHub Actions` に変更すれば公開できます。
 
 
