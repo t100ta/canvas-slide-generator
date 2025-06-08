@@ -3,7 +3,7 @@ import { initializeCanvas, clearCanvas, renderSlide, renderSlideIndicator } from
 import { parseMarkdownSlides } from './markdown.js';
 import { applyCRTEffects, updateAnimation } from './effects.js';
 import { themes, getThemeByName, updateThemeStyles } from './theme.js';
-import { exportAsHTML, exportAsPNG, exportAsPDF } from './export.js';
+import { exportAsHTML } from './export.js';
 import { createTransition } from './transitions.js';
 import { debounce } from './utils.js';
 
@@ -112,11 +112,7 @@ Drop a Markdown file or use the file input to load your presentation.
     const exportHtmlBtn = document.getElementById('exportHtmlBtn');
     exportHtmlBtn?.addEventListener('click', () => this.exportPresentation('html'));
 
-    const exportPngBtn = document.getElementById('exportPngBtn');
-    exportPngBtn?.addEventListener('click', () => this.exportPresentation('png'));
-
-    const exportPdfBtn = document.getElementById('exportPdfBtn');
-    exportPdfBtn?.addEventListener('click', () => this.exportPresentation('pdf'));
+    // PNG and PDF export removed
 
     const toggleAnimationBtn = document.getElementById('toggleAnimationBtn');
     toggleAnimationBtn?.addEventListener('click', () => this.toggleAnimation());
@@ -310,12 +306,6 @@ Drop a Markdown file or use the file input to load your presentation.
       switch (format) {
         case 'html':
           await exportAsHTML(this.renderCtx, this.markdownContent);
-          break;
-        case 'png':
-          await exportAsPNG(this.renderCtx, this.markdownContent);
-          break;
-        case 'pdf':
-          await exportAsPDF(this.renderCtx, this.markdownContent);
           break;
         default:
           console.error('Unsupported export format:', format);
