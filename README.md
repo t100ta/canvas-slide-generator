@@ -1,30 +1,30 @@
 # Canvas Slide Generator
 
-TypeScript + ViteでMarkdownからCRTスタイルのCanvas スライドを生成するツールです。
+TypeScript + Vite で Markdown から CRT スタイルの Canvas スライドを生成するツールです。
 
 ## 機能
 
-- **Markdownパーサー**: リアルタイムでMarkdownコンテンツを解析
-- **Canvas描画**: HTML5 Canvasを使用した高品質な描画
-- **CRT効果**: レトロなCRT風の視覚効果
+- **Markdown パーサー**: リアルタイムで Markdown コンテンツを解析
+- **Canvas 描画**: HTML5 Canvas を使用した高品質な描画
+- **CRT 効果**: レトロな CRT 風の視覚効果
   - スキャンライン効果
-  - RGBオフセット
+  - RGB オフセット
   - ノイズ効果
   - ビネット効果
   - グリッチトランジション
-- **画像サポート**: ドラッグ&ドロップでの画像追加とbase64変換
-- **画像サポート**: ドラッグ&ドロップでの画像追加とbase64変換。画像はスライド内で自動的に中央寄せされ、余白に合わせてサイズ調整されます。
+- **画像サポート**: ドラッグ&ドロップでの画像追加と base64 変換
+- **画像サポート**: ドラッグ&ドロップでの画像追加と base64 変換。画像はスライド内で自動的に中央寄せされ、余白に合わせてサイズ調整されます。
 - **アニメーション**: 時間ベースの微細なアニメーション効果
 - **ボタンエフェクト**: テーマ色に連動したネオングロウ効果
-- **HTML出力**: スタンドアロンHTMLファイルとしてエクスポート
+- **HTML 出力**: スタンドアロン HTML ファイルとしてエクスポート
 
 ## 技術仕様
 
 - **解像度**: 1280x720 (16:9)
 - **コンテンツエリア**: 960x720 (4:3) 中央配置
-- **サイドマージン**: レトロTV風のビジュアルバンド
+- **サイドマージン**: レトロ TV 風のビジュアルバンド
 - **フォント**: Courier New (モノスペース)
-- **カラーパレット**: グリーン系CRTスタイル
+- **カラーパレット**: グリーン系 CRT スタイル
 
 ## 使用方法
 
@@ -42,12 +42,16 @@ npm run build
 
 # コンパイルテスト
 ```
+
 npm test
+
 ```
 
 ## カバレッジ表示
 ```
+
 npm run coverage
+
 ```
 
 ### アプリケーションの使用
@@ -75,22 +79,24 @@ npm run coverage
 ## プロジェクト構造
 
 ```
+
 canvas-slide-generator/
 ├── src/
-│   ├── main.ts          # メインアプリケーション
-│   ├── types.ts         # TypeScript型定義
-│   ├── utils.ts         # ユーティリティ関数
-│   ├── markdown.ts      # Markdownパーサー
-│   ├── canvas.ts        # Canvas描画エンジン
-│   ├── effects.ts       # CRT効果とアニメーション
-│   ├── ui.ts           # UI管理
-│   └── export.ts       # HTML出力機能
-├── index.html          # メインHTMLファイル
-├── sample.md           # サンプルMarkdownファイル
-├── vite.config.ts      # Vite設定
-├── tsconfig.json       # TypeScript設定
-└── package.json        # プロジェクト設定
-```
+│ ├── main.ts # メインアプリケーション
+│ ├── types.ts # TypeScript 型定義
+│ ├── utils.ts # ユーティリティ関数
+│ ├── markdown.ts # Markdown パーサー
+│ ├── canvas.ts # Canvas 描画エンジン
+│ ├── effects.ts # CRT 効果とアニメーション
+│ ├── ui.ts # UI 管理
+│ └── export.ts # HTML 出力機能
+├── index.html # メイン HTML ファイル
+├── sample.md # サンプル Markdown ファイル
+├── vite.config.ts # Vite 設定
+├── tsconfig.json # TypeScript 設定
+└── package.json # プロジェクト設定
+
+````
 
 ## 対応Markdown記法
 
@@ -167,10 +173,6 @@ Canvas Slide Generator - TypeScript + Vite implementation
 ```bash
 # 静的ファイルのビルド (docsディレクトリに出力)
 npm run build:pages
-```
+````
 
-`.github/workflows/pages.yml` により、`main`ブランチへプッシュすると自動的にビルドが実行され、
-生成された`docs`ディレクトリの内容がGitHub Pagesへデプロイされます。リポジトリ設定で
-Pagesソースを`GitHub Actions`に設定するだけで公開できます。
-
-
+`.github/workflows/pages.yml` により、`main`ブランチへプッシュすると自動的にビルドが実行され、生成された`docs`ディレクトリの内容が GitHub Pages にデプロイされます。ワークフローでは `actions/upload-pages-artifact@v3` と `actions/deploy-pages@v4` を使用しています。リポジトリ設定で Pages ソースを `GitHub Actions` に変更すれば公開できます。
