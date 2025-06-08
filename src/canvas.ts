@@ -155,20 +155,21 @@ export const renderImage = async (
     const scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
     const scaledWidth = img.width * scale;
     const scaledHeight = img.height * scale;
+    const drawX = x + (maxWidth - scaledWidth) / 2;
     
     // Add border effect
     ctx.strokeStyle = theme.primaryColor;
     ctx.lineWidth = 2;
-    ctx.strokeRect(x - 2, y - 2, scaledWidth + 4, scaledHeight + 4);
+    ctx.strokeRect(drawX - 2, y - 2, scaledWidth + 4, scaledHeight + 4);
     
     // Draw image
-    ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+    ctx.drawImage(img, drawX, y, scaledWidth, scaledHeight);
     
     // Add scanline effect over image
     ctx.globalAlpha = 0.3;
     ctx.fillStyle = theme.backgroundColor;
     for (let i = 0; i < scaledHeight; i += 4) {
-      ctx.fillRect(x, y + i, scaledWidth, 2);
+      ctx.fillRect(drawX, y + i, scaledWidth, 2);
     }
     ctx.globalAlpha = 1;
     
@@ -249,13 +250,15 @@ export const renderSlide = async (
         
       case 'image':
         if (element.src) {
+          const remaining = config.height - currentY - 40;
+          const maxHeight = Math.min(remaining, 300);
           const imageResult = await renderImage(
             renderCtx,
             element.src,
             leftPadding,
             currentY,
             maxContentWidth,
-            200
+            maxHeight
           );
           currentY += imageResult.height + 20;
         }
