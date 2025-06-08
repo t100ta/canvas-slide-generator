@@ -160,3 +160,15 @@ canvas-slide-generator/
 
 Canvas Slide Generator - TypeScript + Vite implementation
 
+## GitHub Pages
+
+このリポジトリにはGitHub Pagesで公開するための設定が含まれています。
+
+```bash
+# 静的ファイルのビルド (docsディレクトリに出力)
+npm run build:pages
+```
+
+`.github/workflows/pages.yml` により、`main`ブランチへプッシュすると自動的にビルドが実行され、生成された`docs`ディレクトリが GitHub Pages にデプロイされます。ワークフローでは `actions/upload-pages-artifact@v3` と `actions/deploy-pages@v4` を使用しています。リポジトリ設定で Pages ソースを `GitHub Actions` に変更すれば公開できます。
+
+
