@@ -7,7 +7,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "tsc --noEmit",
-    "jest": "jest"
+    "jest": "jest",
+    "coverage": "npm run jest -- --coverage"
   },
   "keywords": [],
   "author": "",

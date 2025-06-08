@@ -40,7 +40,13 @@ npm run dev
 npm run build
 
 # コンパイルテスト
+```
 npm test
+```
+
+## カバレッジ表示
+```
+npm run coverage
 ```
 
 ### アプリケーションの使用
