@@ -34,16 +34,16 @@ export const exportAsHTML = async (
         
         .presentation-container {
             position: relative;
-            max-width: 100vw;
-            max-height: 100vh;
+            width: 100vw;
+            height: 100vh;
         }
-        
+
         .slide-canvas {
             border: 2px solid ${theme.primaryColor};
             box-shadow: 0 0 20px ${theme.primaryColor}40;
             background: ${theme.backgroundColor};
-            max-width: 100vw;
-            max-height: 100vh;
+            width: 100%;
+            height: 100%;
         }
         
         .controls {
@@ -60,6 +60,14 @@ export const exportAsHTML = async (
             align-items: center;
             font-size: 12px;
             color: ${theme.secondaryColor};
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .controls.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
         
         .slide-indicator {
@@ -171,11 +179,26 @@ export const exportAsHTML = async (
         // Get canvas and context
         const canvas = document.getElementById('slideCanvas');
         const ctx = canvas.getContext('2d');
+        const controlsEl = document.querySelector('.controls');
+        let controlsTimeout = null;
+
+        function showControls() {
+            controlsEl.classList.add('visible');
+            if (controlsTimeout) clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(() => {
+                controlsEl.classList.remove('visible');
+            }, 2000);
+        }
+
+        canvas.addEventListener('mousemove', showControls);
+        canvas.addEventListener('touchstart', showControls);
+        canvas.addEventListener('mouseleave', () => controlsEl.classList.remove('visible'));
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             renderCurrentSlide();
             startAnimation();
+            showControls();
         });
         
         // Keyboard controls
