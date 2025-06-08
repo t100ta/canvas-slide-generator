@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';">
+    <title>CRT Canvas Slide Generator</title>
+    <style>
+        :root {
+            --primary-color: #00ff00;
+            --secondary-color: #00cc00;
+            --background-color: #000000;
+            --accent-color: #00ffff;
+            --editor-width: 300px;
+            --font-family: 'Courier New', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--background-color);
+            color: var(--primary-color);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .control-group label {
+            font-size: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .file-input, .theme-selector, .effect-selector {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px;
+            border-radius: 3px;
+            font-family: var(--font-family);
+            font-size: 11px;
+        }
+        
+        .btn {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        .btn:active {
+            background: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color) inset;
+            transform: scale(0.95);
+        }
+        
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: var(--editor-width);
+            width: calc(100% - var(--editor-width));
+            padding-top: 60px;
+        }
+        
+        #slideCanvas {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            background: var(--background-color);
+            max-width: 100vw;
+            max-height: calc(100vh - 80px);
+        }
+        
+        .navigation-help {
+            position: fixed;
+            bottom: 10px;
+            left: 20px;
+            font-size: 10px;
+            color: var(--secondary-color);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 5px 10px;
+            border-radius: 3px;
+            border: 1px solid var(--secondary-color);
+            z-index: 1001;
+        }
+        
+        .drop-zone {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px dashed var(--primary-color);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 2000;
+        }
+        
+        .drop-zone.active {
+            display: block;
+        }
+        
+        .drop-zone h2 {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .markdown-editor {
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            width: var(--editor-width);
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border-right: 1px solid var(--primary-color);
+            z-index: 900;
+        }
+
+        #markdownEditor {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            font-family: var(--font-family);
+            font-size: 12px;
+            padding: 5px;
+            resize: vertical;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .canvas-container {
+                margin-left: 0;
+                width: 100%;
+                padding-top: 120px;
+            }
+
+            .markdown-editor {
+                width: 100%;
+                top: auto;
+                bottom: 0;
+                height: 200px;
+                border-right: none;
+                border-top: 1px solid var(--primary-color);
+            }
+
+            .navigation-help {
+                font-size: 8px;
+                bottom: 5px;
+                left: 5px;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="./assets/index-BBh0QN1D.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>CRT Canvas Slide Generator</h1>
+        <div class="controls">
+            <div class="control-group">
+                <label>Markdown File</label>
+                <input type="file" id="markdownFile" class="file-input" accept=".md,.txt">
+            </div>
+
+            <div class="control-group">
+                <label>Image File</label>
+                <input type="file" id="imageFile" class="file-input" accept="image/*">
+            </div>
+            
+            <div class="control-group">
+                <label>Theme</label>
+                <select id="themeSelector" class="theme-selector">
+                    <option value="Green Phosphor">Green Phosphor</option>
+                    <option value="Blue CRT">Blue CRT</option>
+                    <option value="Amber Terminal">Amber Terminal</option>
+                    <option value="Purple Neon">Purple Neon</option>
+                    <option value="Pixel Perfect">Pixel Perfect</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Effects</label>
+                <select id="effectSelector" class="effect-selector">
+                    <option value="none">No Effects</option>
+                    <option value="light" selected>Light Effects</option>
+                    <option value="heavy">Heavy Effects</option>
+                    <option value="extreme">Extreme Effects</option>
+                </select>
+            </div>
+            
+            <button id="exportHtmlBtn" class="btn">Export HTML</button>
+            <button id="toggleAnimationBtn" class="btn">Toggle Animation</button>
+        </div>
+    </div>
+    
+    <div class="canvas-container">
+        <canvas id="slideCanvas" width="1280" height="720"></canvas>
+    </div>
+    
+    <div class="navigation-help">
+        Navigation: ← → (slides) | Space (animation) | F (fullscreen)
+    </div>
+    
+    <div class="drop-zone" id="dropZone">
+        <h2>Drop Markdown File Here</h2>
+        <p>Supports .md and .txt files</p>
+    </div>
+
+    <div class="markdown-editor">
+        <textarea id="markdownEditor" placeholder="Type Markdown here"></textarea>
+    </div>
+
+</body>
+</html>
+
