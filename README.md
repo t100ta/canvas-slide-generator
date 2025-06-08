@@ -37,8 +37,8 @@ npm run dev
 # ビルド
 npm run build
 
-# 型チェック
-npm run typecheck
+# コンパイルテスト
+npm test
 ```
 
 ### アプリケーションの使用

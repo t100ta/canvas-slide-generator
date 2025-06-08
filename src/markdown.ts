@@ -130,8 +130,13 @@ export const extractImages = (content: string): string[] => {
   return images;
 };
 
-export const replaceImageWithBase64 = (content: string, imageName: string, base64Data: string): string => {
-  const imageRegex = new RegExp(`!\\[([^\\]]*)\\]\\([^)]*${imageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^)]*\\)`, 'g');
+export const replaceImageWithBase64 = (
+  content: string,
+  imageName: string,
+  base64Data: string
+): string => {
+  const escaped = imageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const imageRegex = new RegExp(`!\\[([^\\]]*)\\]\\(([^)]*${escaped}[^)]*)\\)`, 'g');
   return content.replace(imageRegex, `![$1](${base64Data})`);
 };
 
