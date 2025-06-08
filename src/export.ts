@@ -401,8 +401,9 @@ export const exportAsHTML = async (
             
             // Scanlines
             if (effectsData.scanlines) {
-                const step = effectsData.level === 'heavy' ? 3 : 4;
-                const dim = effectsData.level === 'heavy' ? 0.7 : 0.85;
+                const level = effectsData.level;
+                const step = level === 'extreme' ? 1 : level === 'heavy' ? 2 : 3;
+                const dim = level === 'extreme' ? 0.6 : level === 'heavy' ? 0.7 : 0.85;
                 for (let y = 0; y < 720; y += step) {
                     for (let x = 0; x < 1280; x++) {
                         const index = (y * 1280 + x) * 4;
@@ -415,7 +416,8 @@ export const exportAsHTML = async (
             
             // Noise
             if (effectsData.noise) {
-                const intensity = effectsData.level === 'heavy' ? 0.25 : effectsData.level === 'light' ? 0.08 : 0;
+                const level = effectsData.level;
+                const intensity = level === 'extreme' ? 0.35 : level === 'heavy' ? 0.25 : level === 'light' ? 0.08 : 0;
                 for (let i = 0; i < data.length; i += 4) {
                     const noise = (Math.random() - 0.5) * intensity * 255;
                     data[i] += noise;     // R
@@ -423,8 +425,42 @@ export const exportAsHTML = async (
                     data[i + 2] += noise; // B
                 }
             }
-            
-            ctx.putImageData(imageData, 0, 0);
+
+            let finalImage = imageData;
+
+            // RGB Offset
+            if (effectsData.rgbOffset && (effectsData.level === 'heavy' || effectsData.level === 'extreme')) {
+                const level = effectsData.level;
+                const offsetScaleX = level === 'extreme' ? 8 : 5;
+                const offsetScaleY = level === 'extreme' ? 6 : 3;
+                const offsetX = Math.sin(time * 0.01) * offsetScaleX;
+                const offsetY = Math.cos(time * 0.015) * offsetScaleY;
+
+                const src = imageData.data;
+                const out = new Uint8ClampedArray(src);
+                
+                for (let y = 0; y < 720; y++) {
+                    for (let x = 0; x < 1280; x++) {
+                        const i = (y * 1280 + x) * 4;
+                        const rx = Math.max(0, Math.min(1279, Math.floor(x - offsetX)));
+                        const ry = Math.max(0, Math.min(719, Math.floor(y - offsetY)));
+                        const rIndex = (ry * 1280 + rx) * 4;
+
+                        const bx = Math.max(0, Math.min(1279, Math.floor(x + offsetX)));
+                        const by = Math.max(0, Math.min(719, Math.floor(y + offsetY)));
+                        const bIndex = (by * 1280 + bx) * 4;
+
+                        out[i] = src[rIndex];
+                        out[i + 1] = src[i + 1];
+                        out[i + 2] = src[bIndex + 2];
+                        out[i + 3] = src[i + 3];
+                    }
+                }
+
+                finalImage = new ImageData(out, 1280, 720);
+            }
+
+            ctx.putImageData(finalImage, 0, 0);
         }
     </script>
 </body>
