@@ -58,6 +58,7 @@ export const initializeCanvas = (canvas: HTMLCanvasElement, theme: Theme): Rende
       progress: 0,
       isActive: false
     },
+    previousCanvas: null,
     images: new Map(),
   };
 };
