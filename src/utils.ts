@@ -38,13 +38,22 @@ export const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
+const loadedImages: Map<string, Promise<HTMLImageElement>> = new Map();
+
 export const loadImage = (src: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve, reject) => {
+  if (loadedImages.has(src)) {
+    return loadedImages.get(src)!;
+  }
+
+  const promise = new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
     img.src = src;
   });
+
+  loadedImages.set(src, promise);
+  return promise;
 };
 
 export const downloadFile = (content: string, filename: string, mimeType: string = 'text/html'): void => {

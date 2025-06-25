@@ -64,8 +64,11 @@ const parseSlideContent = async (
             } else if (i % 3 === 2) {
               const alt = parts[i - 1] || '';
               let src = parts[i];
+              const base = src.split('/').pop() || src;
               if (images?.has(src)) {
                 src = images.get(src)!.data;
+              } else if (images?.has(base)) {
+                src = images.get(base)!.data;
               }
               parsed.push({
                 type: 'image',
@@ -98,8 +101,11 @@ const parseSlideContent = async (
       case 'image': {
         const alt = token.text || '';
         let src = token.href || '';
+        const base = src.split('/').pop() || src;
         if (images?.has(src)) {
           src = images.get(src)!.data;
+        } else if (images?.has(base)) {
+          src = images.get(base)!.data;
         }
         parsed.push({
           type: 'image',

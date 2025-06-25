@@ -33,6 +33,15 @@ describe('markdown utilities', () => {
     expect(imgEl?.src).toBe('data:img');
   });
 
+  test('parseMarkdownSlides resolves image by basename', async () => {
+    const md = '# t\n\n![a](assets/image.png)';
+    const images = new Map<string, any>();
+    images.set('image.png', { name: 'image.png', data: 'base64data', width: 1, height: 1 });
+    const result = await parseMarkdownSlides(md, images);
+    const imgEl = result.slides[0].elements.find(e => e.type === 'image');
+    expect(imgEl?.src).toBe('base64data');
+  });
+
   test('validateMarkdown detects empty url', () => {
     const result = validateMarkdown('![]( )');
     expect(result.valid).toBe(false);
