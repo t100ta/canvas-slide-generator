@@ -3,7 +3,7 @@ import type { Theme } from './types.js';
 export const themes: Theme[] = [
   {
     name: 'Green Phosphor',
-    font: 'Courier New, monospace',
+    font: '"DotGothic16", "Courier New", monospace',
     primaryColor: '#00ff00',
     secondaryColor: '#00cc00',
     backgroundColor: '#000000',
@@ -11,7 +11,7 @@ export const themes: Theme[] = [
   },
   {
     name: 'Blue CRT',
-    font: 'Courier New, monospace',
+    font: '"DotGothic16", "Courier New", monospace',
     primaryColor: '#00aaff',
     secondaryColor: '#0088cc',
     backgroundColor: '#000011',
@@ -19,7 +19,7 @@ export const themes: Theme[] = [
   },
   {
     name: 'Amber Terminal',
-    font: 'Courier New, monospace',
+    font: '"DotGothic16", "Courier New", monospace',
     primaryColor: '#ffaa00',
     secondaryColor: '#cc8800',
     backgroundColor: '#110800',
@@ -27,7 +27,7 @@ export const themes: Theme[] = [
   },
   {
     name: 'Purple Neon',
-    font: 'Courier New, monospace',
+    font: '"DotGothic16", "Courier New", monospace',
     primaryColor: '#aa00ff',
     secondaryColor: '#8800cc',
     backgroundColor: '#110011',
@@ -35,7 +35,7 @@ export const themes: Theme[] = [
   },
   {
     name: 'Pixel Perfect',
-    font: '"Courier New", "Lucida Console", monospace',
+    font: '"DotGothic16", "Courier New", "Lucida Console", monospace',
     primaryColor: '#ffffff',
     secondaryColor: '#cccccc',
     backgroundColor: '#222222',
