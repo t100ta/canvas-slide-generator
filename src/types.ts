@@ -79,6 +79,7 @@ export type RenderContext = {
   animation: AnimationState;
   navigation: NavigationState;
   transition: TransitionState;
+  previousCanvas?: HTMLCanvasElement | null;
   images: Map<string, ImageAsset>;
 };
 export type TransitionType = 'none' | 'fade' | 'slide' | 'crt-flicker' | 'glitch';

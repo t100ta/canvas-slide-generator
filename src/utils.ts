@@ -70,3 +70,14 @@ export const formatTimestamp = (): string => {
   return now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
 };
 
+export const cloneCanvas = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+  const copy = document.createElement('canvas');
+  copy.width = canvas.width;
+  copy.height = canvas.height;
+  const ctx = copy.getContext('2d');
+  if (ctx) {
+    ctx.drawImage(canvas, 0, 0);
+  }
+  return copy;
+};
+

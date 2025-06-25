@@ -1,11 +1,11 @@
-import type { RenderContext, MarkdownContent, EffectLevel, ExportFormat } from './types.js';
+import type { RenderContext, MarkdownContent, EffectLevel, ExportFormat, TransitionType } from './types.js';
 import { initializeCanvas, clearCanvas, renderSlide, renderSlideIndicator } from './canvas.js';
 import { parseMarkdownSlides, processImageFile, insertImageIntoMarkdown } from './markdown.js';
 import { applyCRTEffects, updateAnimation } from './effects.js';
 import { themes, getThemeByName, updateThemeStyles } from './theme.js';
 import { exportAsHTML } from './export.js';
-import { createTransition } from './transitions.js';
-import { debounce } from './utils.js';
+import { createTransition, startTransition, updateTransition, applyTransition } from './transitions.js';
+import { debounce, cloneCanvas } from './utils.js';
 
 class SlidePresentation {
   private renderCtx: RenderContext;
@@ -116,6 +116,13 @@ Drop a Markdown file or use the file input to load your presentation.
       this.changeEffectLevel(level);
     });
 
+    // Transition selector
+    const transitionSelector = document.getElementById('transitionSelector') as HTMLSelectElement;
+    transitionSelector?.addEventListener('change', (e) => {
+      const type = (e.target as HTMLSelectElement).value as TransitionType;
+      this.changeTransition(type);
+    });
+
     // Export buttons
     const exportHtmlBtn = document.getElementById('exportHtmlBtn');
     exportHtmlBtn?.addEventListener('click', () => this.exportPresentation('html'));
@@ -202,6 +209,8 @@ Drop a Markdown file or use the file input to load your presentation.
 
   private previousSlide(): void {
     if (this.renderCtx.navigation.canGoPrev) {
+      this.renderCtx.previousCanvas = cloneCanvas(this.renderCtx.canvas);
+      this.renderCtx.transition = startTransition(this.renderCtx.transition);
       this.renderCtx.navigation.currentSlide--;
       this.updateNavigationState();
       this.render();
@@ -210,6 +219,8 @@ Drop a Markdown file or use the file input to load your presentation.
 
   private nextSlide(): void {
     if (this.renderCtx.navigation.canGoNext) {
+      this.renderCtx.previousCanvas = cloneCanvas(this.renderCtx.canvas);
+      this.renderCtx.transition = startTransition(this.renderCtx.transition);
       this.renderCtx.navigation.currentSlide++;
       this.updateNavigationState();
       this.render();
@@ -257,6 +268,10 @@ Drop a Markdown file or use the file input to load your presentation.
     this.render();
   }
 
+  private changeTransition(type: TransitionType): void {
+    this.renderCtx.transition.type = type;
+  }
+
   private toggleAnimation(): void {
     this.renderCtx.animation.enabled = !this.renderCtx.animation.enabled;
     
@@ -283,7 +298,11 @@ Drop a Markdown file or use the file input to load your presentation.
     const animate = () => {
       if (this.renderCtx.animation.enabled) {
         updateAnimation(this.renderCtx);
+        this.renderCtx.transition = updateTransition(this.renderCtx.transition, 16);
         this.render();
+        if (!this.renderCtx.transition.isActive) {
+          this.renderCtx.previousCanvas = null;
+        }
         this.animationId = requestAnimationFrame(animate);
       }
     };
@@ -315,6 +334,11 @@ Drop a Markdown file or use the file input to load your presentation.
     // Render slide indicator
     if (this.renderCtx.navigation.totalSlides > 1) {
       renderSlideIndicator(this.renderCtx);
+    }
+
+    // Apply transition from previous slide
+    if (this.renderCtx.transition.isActive && this.renderCtx.previousCanvas) {
+      applyTransition(this.renderCtx, this.renderCtx.previousCanvas);
     }
 
     // Apply CRT effects based on effect level
