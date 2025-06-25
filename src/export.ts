@@ -182,6 +182,18 @@ export const exportAsHTML = async (
         const controlsEl = document.querySelector('.controls');
         let controlsTimeout = null;
 
+        // Preload images referenced in the slides
+        const imageCache = new Map();
+        slideData.slides.forEach(slide => {
+            slide.elements.forEach(el => {
+                if (el.type === 'image' && el.src) {
+                    const img = new Image();
+                    img.src = el.src;
+                    imageCache.set(el.src, img);
+                }
+            });
+        });
+
         function showControls() {
             controlsEl.classList.add('visible');
             if (controlsTimeout) clearTimeout(controlsTimeout);
@@ -383,13 +395,25 @@ export const exportAsHTML = async (
                         if (element.items) {
                             ctx.font = \`16px \${themeData.font}\`;
                             ctx.fillStyle = themeData.primaryColor;
-                            
+
                             element.items.forEach(item => {
                                 ctx.fillText(\`• \${item}\`, leftPadding + 20, y);
                                 y += 20;
                             });
                         }
                         y += 10;
+                        break;
+
+                    case 'image':
+                        const img = imageCache.get(element.src);
+                        if (img && img.complete) {
+                            const scale = Math.min(900 / img.width, 300 / img.height, 1);
+                            const w = img.width * scale;
+                            const h = img.height * scale;
+                            const drawX = leftPadding + (900 - w) / 2;
+                            ctx.drawImage(img, drawX, y, w, h);
+                            y += h + 20;
+                        }
                         break;
                 }
                 
