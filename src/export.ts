@@ -182,12 +182,21 @@ export const exportAsHTML = async (
         const controlsEl = document.querySelector('.controls');
         let controlsTimeout = null;
 
-        // Preload images referenced in the slides
+        // Preload images referenced in the slides and re-render once loaded
         const imageCache = new Map();
+        let loaded = 0;
+        let total = 0;
         slideData.slides.forEach(slide => {
             slide.elements.forEach(el => {
                 if (el.type === 'image' && el.src) {
+                    total++;
                     const img = new Image();
+                    img.onload = () => {
+                        loaded++;
+                        if (loaded === total) {
+                            renderCurrentSlide();
+                        }
+                    };
                     img.src = el.src;
                     imageCache.set(el.src, img);
                 }
