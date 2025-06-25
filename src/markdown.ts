@@ -8,7 +8,10 @@ marked.setOptions({
   gfm: true,
 });
 
-export const parseMarkdownSlides = async (content: string): Promise<MarkdownContent> => {
+export const parseMarkdownSlides = async (
+  content: string,
+  images?: Map<string, ImageAsset>
+): Promise<MarkdownContent> => {
   // Split content by slide separators (---)
   const slideTexts = content.split(/^---\s*$/m).map(text => text.trim()).filter(text => text.length > 0);
   
@@ -16,7 +19,7 @@ export const parseMarkdownSlides = async (content: string): Promise<MarkdownCont
   
   for (let i = 0; i < slideTexts.length; i++) {
     const slideText = slideTexts[i];
-    const elements = await parseSlideContent(slideText);
+    const elements = await parseSlideContent(slideText, images);
     
     slides.push({
       index: i,
@@ -30,7 +33,10 @@ export const parseMarkdownSlides = async (content: string): Promise<MarkdownCont
   };
 };
 
-const parseSlideContent = async (content: string): Promise<ParsedElement[]> => {
+const parseSlideContent = async (
+  content: string,
+  images?: Map<string, ImageAsset>
+): Promise<ParsedElement[]> => {
   const tokens = marked.lexer(content);
   const parsed: ParsedElement[] = [];
   
@@ -44,24 +50,23 @@ const parseSlideContent = async (content: string): Promise<ParsedElement[]> => {
         });
         break;
         
-      case 'paragraph':
-        // Check for images in paragraph
+      case 'paragraph': {
         const imageMatches = token.text.match(/!\[([^\]]*)\]\(([^)]+)\)/g);
         if (imageMatches) {
-          // Split paragraph by images
           const parts = token.text.split(/!\[([^\]]*)\]\(([^)]+)\)/);
-          
+
           for (let i = 0; i < parts.length; i++) {
             if (i % 3 === 0 && parts[i].trim()) {
-              // Text part
               parsed.push({
                 type: 'paragraph',
                 content: parts[i].trim(),
               });
             } else if (i % 3 === 2) {
-              // Image part
               const alt = parts[i - 1] || '';
-              const src = parts[i];
+              let src = parts[i];
+              if (images?.has(src)) {
+                src = images.get(src)!.data;
+              }
               parsed.push({
                 type: 'image',
                 content: '',
@@ -77,9 +82,10 @@ const parseSlideContent = async (content: string): Promise<ParsedElement[]> => {
           });
         }
         break;
+      }
         
       case 'list':
-        const items = token.items.map((item: any) => 
+        const items = token.items.map((item: any) =>
           typeof item.text === 'string' ? item.text : item.text || ''
         );
         parsed.push({
@@ -88,6 +94,21 @@ const parseSlideContent = async (content: string): Promise<ParsedElement[]> => {
           items,
         });
         break;
+
+      case 'image': {
+        const alt = token.text || '';
+        let src = token.href || '';
+        if (images?.has(src)) {
+          src = images.get(src)!.data;
+        }
+        parsed.push({
+          type: 'image',
+          content: '',
+          alt,
+          src,
+        });
+        break;
+      }
         
       case 'code':
         parsed.push({
@@ -152,9 +173,9 @@ export const processImageFile = async (file: File): Promise<ImageAsset> => {
   };
 };
 
-export const insertImageIntoMarkdown = (content: string, imageName: string, base64Data: string): string => {
+export const insertImageIntoMarkdown = (content: string, imageName: string): string => {
   const cleanName = imageName.replace(/\.[^/.]+$/, ''); // Remove extension
-  const imageMarkdown = `![${cleanName}](${base64Data})`;
+  const imageMarkdown = `![${cleanName}](${imageName})`;
   
   // Insert at the end of the content
   return content.trim() + '\n\n' + imageMarkdown;

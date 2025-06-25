@@ -132,7 +132,7 @@ export class UIManager {
         // Auto-insert into markdown if textarea has content
         const currentContent = this.markdownTextarea.value;
         if (currentContent.trim()) {
-          const newContent = insertImageIntoMarkdown(currentContent, file.name, imageAsset.data);
+          const newContent = insertImageIntoMarkdown(currentContent, file.name);
           this.markdownTextarea.value = newContent;
           this.onMarkdownChange(newContent);
         }
