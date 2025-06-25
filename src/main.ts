@@ -171,9 +171,10 @@ Drop a Markdown file or use the file input to load your presentation.
   private async loadImageFile(file: File): Promise<void> {
     try {
       const asset = await processImageFile(file);
+      this.renderCtx.images.set(file.name, asset);
       const markdownEditor = document.getElementById('markdownEditor') as HTMLTextAreaElement | null;
       if (markdownEditor) {
-        const updated = insertImageIntoMarkdown(markdownEditor.value, file.name, asset.data);
+        const updated = insertImageIntoMarkdown(markdownEditor.value, file.name);
         markdownEditor.value = updated;
         await this.loadMarkdown(updated);
       }
@@ -184,7 +185,7 @@ Drop a Markdown file or use the file input to load your presentation.
 
   private async loadMarkdown(content: string): Promise<void> {
     try {
-      this.markdownContent = await parseMarkdownSlides(content);
+      this.markdownContent = await parseMarkdownSlides(content, this.renderCtx.images);
       this.renderCtx.navigation.totalSlides = this.markdownContent.slides.length;
       this.renderCtx.navigation.currentSlide = 0;
       this.updateNavigationState();

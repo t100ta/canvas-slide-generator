@@ -21,8 +21,16 @@ describe('markdown utilities', () => {
   });
 
   test('insertImageIntoMarkdown appends image', () => {
-    const inserted = insertImageIntoMarkdown('# h', 'pic.jpg', 'dataurl');
-    expect(inserted.trim().endsWith('![pic](dataurl)')).toBe(true);
+    const inserted = insertImageIntoMarkdown('# h', 'pic.jpg');
+    expect(inserted.trim().endsWith('![pic](pic.jpg)')).toBe(true);
+  });
+
+  test('parseMarkdownSlides resolves image references', async () => {
+    const images = new Map<string, any>();
+    images.set('image.png', { name: 'image.png', data: 'data:img', width: 1, height: 1 });
+    const result = await parseMarkdownSlides(sample, images);
+    const imgEl = result.slides[0].elements.find(e => e.type === 'image');
+    expect(imgEl?.src).toBe('data:img');
   });
 
   test('validateMarkdown detects empty url', () => {
